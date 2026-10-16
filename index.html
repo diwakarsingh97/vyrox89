@@ -1,0 +1,756 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#09090f">
+<title>ORBIT — Your Life, In Motion</title>
+<style>
+:root {
+  --bg:#09090f; --panel:#11111b; --panel2:#171725;
+  --line:#29283b; --text:#f4f1ff; --muted:#9290aa;
+  --violet:#9565ff; --lavender:#c7aaff; --green:#8ce8bc;
+  --danger:#ff879d; --radius:19px;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+font:15px/1.5 Inter,ui-sans-serif,system-ui,-apple-system,sans-serif}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{
+outline:2px solid var(--lavender);outline-offset:3px}
+button:disabled{opacity:.45;cursor:not-allowed}
+.app{min-height:100vh}
+.sidebar{position:fixed;inset:0 auto 0 0;width:235px;padding:25px 17px;
+background:#0c0c14;border-right:1px solid var(--line);z-index:5}
+.brand{display:flex;align-items:center;gap:11px;font-size:21px;
+font-weight:850;letter-spacing:2px;padding:5px 8px 28px}
+.logo{width:37px;height:37px;border-radius:13px;
+background:linear-gradient(135deg,#bca1ff,#7543f3);
+display:grid;place-items:center;color:#100923;font-weight:900}
+.eyebrow{font-size:10px;color:var(--muted);letter-spacing:1.8px;
+font-weight:800;margin:19px 10px 9px}
+.nav{display:grid;gap:5px}
+.nav button,.secondary{border:0;color:var(--muted);background:transparent;
+padding:11px 12px;border-radius:11px;text-align:left;display:flex;
+gap:12px;align-items:center;width:100%;transition:.2s}
+.nav button:hover,.nav button.active{color:var(--text);background:#211832}
+.nav button.active{box-shadow:inset 3px 0 var(--violet)}
+.nav-icon{width:21px;text-align:center;font-size:17px}
+.sidebar-bottom{position:absolute;bottom:22px;left:17px;right:17px}
+.profile{display:flex;gap:10px;align-items:center;padding:13px 8px;
+border-top:1px solid var(--line);margin-top:15px}
+.avatar{width:37px;height:37px;border-radius:50%;background:#2b2045;
+display:grid;place-items:center;color:var(--lavender);font-weight:800}
+.small{font-size:12px;color:var(--muted)}
+main{margin-left:235px;padding:28px clamp(18px,4vw,55px) 60px;max-width:1700px}
+.topbar{display:flex;align-items:center;justify-content:space-between;
+gap:15px;margin-bottom:32px}
+.top-actions{display:flex;align-items:center;gap:9px}
+.pill,.btn,.iconbtn{border:1px solid var(--line);border-radius:11px;
+background:var(--panel);color:var(--text);padding:10px 14px}
+.btn.primary{background:var(--violet);border-color:var(--violet);
+color:white;font-weight:750}
+.btn:hover,.iconbtn:hover{filter:brightness(1.2)}
+h1{font-size:clamp(26px,3vw,37px);letter-spacing:-1.4px;
+line-height:1.2;margin:0 0 9px}
+h2{font-size:19px;letter-spacing:-.4px;margin:0 0 7px}
+h3{font-size:15px;margin:0 0 6px}
+p{margin:0}
+.muted{color:var(--muted)}
+.view{display:none}
+.view.active{display:block;animation:appear .25s ease}
+@keyframes appear{from{opacity:0;transform:translateY(5px)}
+to{opacity:1;transform:translateY(0)}}
+.grid{display:grid;gap:16px}
+.hero{background:linear-gradient(115deg,#211735,#171426 62%,#151222);
+border:1px solid #3c2a57;border-radius:24px;padding:28px;
+position:relative;overflow:hidden;margin-bottom:18px}
+.hero:after{content:"";position:absolute;width:230px;height:230px;
+right:-90px;top:-105px;border-radius:50%;
+background:radial-gradient(circle,#9565ff38,transparent 70%);
+pointer-events:none}
+.hero-row{display:flex;justify-content:space-between;align-items:center;gap:20px}
+.hero-copy{max-width:560px}
+.hero h1{font-size:clamp(27px,3.6vw,43px);margin:9px 0 13px}
+.hero p{color:#c1bad7;max-width:480px}
+.kicker{font-size:11px;letter-spacing:1.8px;text-transform:uppercase;
+font-weight:800;color:var(--lavender)}
+.orbit-art{width:125px;height:125px;flex-shrink:0;border:1px solid #9d7aff80;
+border-radius:50%;display:grid;place-items:center;position:relative;
+box-shadow:0 0 55px #9565ff20,inset 0 0 35px #9565ff20}
+.orbit-art:before,.orbit-art:after{content:"";position:absolute;
+border:1px solid #a78aff70;border-radius:50%;width:82px;height:135px;
+transform:rotate(55deg)}
+.orbit-art:after{transform:rotate(-55deg)}
+.orbit-core{width:36px;height:36px;background:linear-gradient(135deg,#d9c5ff,#8250ff);
+border-radius:50%;box-shadow:0 0 30px #9565ff}
+.stats{grid-template-columns:repeat(4,minmax(0,1fr));margin-bottom:20px}
+.card{background:var(--panel);border:1px solid var(--line);
+border-radius:var(--radius);padding:20px;min-width:0}
+.stat-top{display:flex;justify-content:space-between;align-items:center;
+color:var(--muted);font-size:12px;gap:6px}
+.stat-number{font-size:30px;letter-spacing:-1.4px;font-weight:800;margin:12px 0 3px}
+.stat-icon{background:#251b3b;border-radius:10px;padding:7px}
+.content-grid{grid-template-columns:minmax(0,1.35fr) minmax(270px,1fr)}
+.section-head{display:flex;justify-content:space-between;align-items:center;
+gap:10px;margin-bottom:17px}
+.link{border:0;background:none;color:var(--lavender);padding:5px}
+.stack{display:grid;gap:11px}
+.item{display:flex;align-items:center;gap:12px;padding:12px 0;
+border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0;padding-bottom:0}
+.check{width:21px;height:21px;accent-color:var(--violet);flex-shrink:0}
+.item-main{flex:1;min-width:0}
+.item-title{font-weight:650;overflow-wrap:anywhere}
+.done .item-title{text-decoration:line-through;color:var(--muted)}
+.tag{font-size:11px;padding:4px 8px;border-radius:7px;
+background:#262037;color:var(--lavender);white-space:nowrap}
+.progress{height:6px;background:#29283b;border-radius:10px;overflow:hidden}
+.progress span{display:block;height:100%;background:linear-gradient(90deg,#8150ed,#c3a3ff);
+border-radius:10px;transition:width .3s}
+.habit-row{display:flex;align-items:center;gap:11px}
+.habit-emoji{font-size:22px;width:35px;text-align:center}
+.habit-row .progress{margin-top:7px}
+.empty{padding:25px 10px;text-align:center;color:var(--muted);font-size:13px}
+.page-intro{margin-bottom:25px}
+.page-intro p{color:var(--muted);margin-top:6px}
+.toolbar{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:17px}
+.toolbar input{flex:1;min-width:160px}
+.field{background:#0d0d16;border:1px solid var(--line);color:var(--text);
+padding:12px 13px;border-radius:11px;width:100%;min-width:0}
+.field::placeholder{color:#6e6c82}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-grid .full{grid-column:1/-1}
+label{font-size:12px;color:var(--muted);display:grid;gap:7px}
+.task-form{margin-bottom:20px}
+.task-form .btn{align-self:end}
+.goal-card{display:grid;gap:15px}
+.goal-meta{display:flex;justify-content:space-between;gap:12px;align-items:center}
+.goal-number{font-size:25px;font-weight:800}
+.journal-entry{white-space:pre-wrap;overflow-wrap:anywhere;color:#d4cfe3;
+margin:12px 0}
+.entry-date{font-size:11px;color:var(--muted)}
+.timer-wrap{text-align:center;padding:38px 15px}
+.timer-ring{width:min(250px,65vw);height:min(250px,65vw);margin:25px auto;
+border-radius:50%;display:grid;place-items:center;
+border:5px solid #29203c;box-shadow:0 0 0 10px #15121f,0 0 60px #9565ff13;
+position:relative}
+.timer-ring:before{content:"";position:absolute;inset:-5px;border-radius:50%;
+border:5px solid transparent;border-top-color:var(--violet);
+transform:rotate(var(--rotation,0deg))}
+.timer-time{font-size:clamp(38px,7vw,54px);font-weight:800;letter-spacing:-2px}
+.timer-modes{display:flex;justify-content:center;gap:8px;flex-wrap:wrap}
+.timer-modes button.selected{background:#302047;border-color:var(--violet)}
+.guide-message{padding:15px;border-radius:15px;background:#211831;
+border:1px solid #44305f;white-space:pre-wrap;overflow-wrap:anywhere}
+.guide-form{display:flex;gap:9px;margin-top:14px}
+.guide-form input{flex:1;min-width:0}
+.mobile-menu{display:none}
+dialog{background:var(--panel);color:var(--text);border:1px solid var(--line);
+border-radius:20px;padding:25px;width:min(450px,calc(100% - 30px))}
+dialog::backdrop{background:#000a;backdrop-filter:blur(5px)}
+dialog h2{margin-bottom:17px}
+.dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:17px}
+.toast{position:fixed;bottom:24px;right:24px;background:#211831;
+border:1px solid #574079;color:var(--text);padding:13px 18px;
+border-radius:13px;z-index:20;box-shadow:0 8px 40px #0008}
+footer{margin-top:30px;color:var(--muted);font-size:11px;text-align:center}
+body.light{--bg:#f5f3fb;--panel:#fff;--panel2:#f0edf8;--line:#e3ddef;
+--text:#211b32;--muted:#777088}
+body.light .sidebar{background:#fff}
+body.light .hero{background:linear-gradient(115deg,#eee5ff,#faf8ff)}
+body.light .hero p{color:#5f5379}
+body.light .field{background:#faf9fd}
+body.light .item-title{color:var(--text)}
+body.light .guide-message{color:var(--text)}
+@media(min-width:1400px){.stats{grid-template-columns:repeat(4,1fr)}}
+@media(max-width:1000px){.stats{grid-template-columns:repeat(2,1fr)}
+.content-grid{grid-template-columns:1fr}}
+@media(max-width:700px){
+.sidebar{width:0;padding:0;overflow:hidden;border:0;transition:width .2s,padding .2s}
+.sidebar.open{width:250px;padding:20px 16px;border-right:1px solid var(--line);
+box-shadow:20px 0 60px #0008}
+main{margin-left:0;padding:18px 15px 45px}
+.mobile-menu{display:inline-flex}
+.topbar{margin-bottom:22px}
+.hero{padding:22px 19px}.orbit-art{width:75px;height:75px}
+.orbit-art:before,.orbit-art:after{width:52px;height:85px}
+.orbit-core{width:25px;height:25px}
+.hero-row{align-items:flex-start}
+.stats{gap:10px}.card{padding:15px}
+.stat-number{font-size:25px}
+.form-grid{grid-template-columns:1fr}
+.form-grid .full{grid-column:auto}
+.guide-form{flex-wrap:wrap}
+}
+@media(max-width:390px){.stats{grid-template-columns:1fr 1fr}
+.orbit-art{display:none}.top-actions .pill{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+<aside class="sidebar" id="sidebar">
+  <div class="brand"><div class="logo">O</div> ORBIT</div>
+  <div class="eyebrow">YOUR WORKSPACE</div>
+  <nav class="nav" id="navigation">
+    <button class="active" data-view="dashboard"><span class="nav-icon">◈</span> Overview</button>
+    <button data-view="tasks"><span class="nav-icon">☷</span> Tasks</button>
+    <button data-view="habits"><span class="nav-icon">✳</span> Habits</button>
+    <button data-view="focus"><span class="nav-icon">◷</span> Focus room</button>
+    <button data-view="goals"><span class="nav-icon">◎</span> Goals</button>
+    <button data-view="journal"><span class="nav-icon">▤</span> Journal</button>
+    <button data-view="guide"><span class="nav-icon">✧</span> Personal guide</button>
+  </nav>
+  <div class="eyebrow">PERSONAL</div>
+  <nav class="nav">
+    <button data-view="settings"><span class="nav-icon">⚙</span> Settings & data</button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="card" style="padding:14px;background:#171222;border-color:#392750">
+      <div class="kicker">A LITTLE REMINDER</div>
+      <p style="margin-top:8px;font-size:13px">Small steps still move you forward.</p>
+    </div>
+    <div class="profile"><div class="avatar" id="avatar">O</div>
+      <div style="min-width:0"><div id="profileName" style="font-weight:700">Your space</div>
+      <div class="small">Personal workspace</div></div>
+    </div>
+  </div>
+</aside>
+
+<main>
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:11px">
+      <button class="iconbtn mobile-menu" id="menuBtn" aria-label="Open navigation">☰</button>
+      <div><div class="kicker">YOUR SPACE. YOUR PACE.</div>
+      <div class="small" id="dateLine"></div></div>
+    </div>
+    <div class="top-actions">
+      <button class="pill" id="themeBtn" title="Toggle theme">◐ Theme</button>
+      <button class="btn primary" id="quickAdd">＋ New task</button>
+    </div>
+  </header>
+
+  <section class="view active" id="view-dashboard">
+    <div class="hero"><div class="hero-row"><div class="hero-copy">
+      <div class="kicker">YOUR NEXT CHAPTER STARTS HERE</div>
+      <h1 id="greeting">Make today count.</h1>
+      <p>You don't need to do everything. You just need a clear next step. Let's make today yours.</p>
+      <div style="display:flex;gap:9px;flex-wrap:wrap;margin-top:20px">
+        <button class="btn primary" data-go="tasks">Plan my day ↗</button>
+        <button class="btn" data-go="focus">Enter focus room</button>
+      </div>
+    </div><div class="orbit-art"><div class="orbit-core"></div></div></div></div>
+
+    <div class="grid stats">
+      <div class="card"><div class="stat-top">Tasks completed <span class="stat-icon">✓</span></div>
+        <div class="stat-number" id="statTasks">0/0</div><div class="small">Today's progress</div></div>
+      <div class="card"><div class="stat-top">Habit progress <span class="stat-icon">✳</span></div>
+        <div class="stat-number" id="statHabits">0%</div><div class="small">Today's consistency</div></div>
+      <div class="card"><div class="stat-top">Focus minutes <span class="stat-icon">◷</span></div>
+        <div class="stat-number" id="statFocus">0</div><div class="small">Minutes completed today</div></div>
+      <div class="card"><div class="stat-top">Active goals <span class="stat-icon">◎</span></div>
+        <div class="stat-number" id="statGoals">0</div><div class="small">Things you're working toward</div></div>
+    </div>
+
+    <div class="grid content-grid">
+      <div class="card"><div class="section-head"><div><h2>Today's priorities</h2>
+        <div class="small">One thing at a time.</div></div><button class="link" data-go="tasks">View all →</button></div>
+        <div class="stack" id="dashboardTasks"></div></div>
+      <div class="card"><div class="section-head"><div><h2>Your daily habits</h2>
+        <div class="small">Consistency over perfection.</div></div><button class="link" data-go="habits">View all →</button></div>
+        <div class="stack" id="dashboardHabits"></div>
+        <div style="margin-top:20px"><div class="section-head"><h3>Daily momentum</h3><span id="momentumLabel" class="small">0%</span></div>
+        <div class="progress"><span id="momentumBar" style="width:0%"></span></div></div>
+      </div>
+    </div>
+    <div class="grid content-grid" style="margin-top:16px">
+      <div class="card"><div class="section-head"><div><h2>North star</h2><div class="small">Your goals, made visible.</div></div>
+        <button class="link" data-go="goals">Explore →</button></div><div id="dashboardGoals"></div></div>
+      <div class="card"><div class="section-head"><div><h2>Mind space</h2><div class="small">Make room for your thoughts.</div></div>
+        <button class="link" data-go="journal">Open journal →</button></div>
+        <p class="muted" style="font-size:13px;margin-bottom:13px">What's one thing you want to remember about today?</p>
+        <button class="btn" data-go="journal">Write a reflection ↗</button></div>
+    </div>
+  </section>
+
+  <section class="view" id="view-tasks">
+    <div class="page-intro"><div class="kicker">MAKE IT HAPPEN</div><h1>Your tasks</h1>
+      <p>Turn the things on your mind into clear next actions.</p></div>
+    <form id="taskForm" class="card task-form">
+      <div class="form-grid">
+        <label class="full">What needs doing?<input class="field" name="title" required maxlength="160" placeholder="e.g. Finish my assignment"></label>
+        <label>Priority<select class="field" name="priority"><option>Medium</option><option>High</option><option>Low</option></select></label>
+        <label>Due date<input class="field" type="date" name="due"></label>
+        <div class="full"><button class="btn primary" type="submit">＋ Add task</button></div>
+      </div>
+    </form>
+    <div class="toolbar"><input class="field" id="taskSearch" placeholder="Search tasks...">
+      <select class="field" style="width:auto" id="taskFilter"><option value="all">All tasks</option><option value="open">To do</option><option value="done">Completed</option></select></div>
+    <div class="card"><div class="section-head"><h2>Your list</h2><span class="small" id="taskCount"></span></div><div class="stack" id="taskList"></div></div>
+  </section>
+
+  <section class="view" id="view-habits">
+    <div class="page-intro"><div class="kicker">REPETITION BUILDS CHANGE</div><h1>Your habits</h1>
+      <p>Build a routine that supports the person you want to become.</p></div>
+    <form id="habitForm" class="card task-form"><div class="form-grid">
+      <label>Habit name<input class="field" name="title" required maxlength="100" placeholder="e.g. Read for 15 minutes"></label>
+      <label>Symbol<select class="field" name="emoji"><option>✳</option><option>📚</option><option>💧</option><option>🏃</option><option>🧘</option><option>✍️</option><option>🌱</option><option>💤</option></select></label>
+      <div class="full"><button class="btn primary" type="submit">＋ Create habit</button></div>
+    </div></form>
+    <div class="grid" id="habitList" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))"></div>
+  </section>
+
+  <section class="view" id="view-focus">
+    <div class="page-intro"><div class="kicker">PROTECT YOUR ATTENTION</div><h1>Focus room</h1>
+      <p>Choose one task. Give it your full attention. The rest can wait.</p></div>
+    <div class="card timer-wrap">
+      <div class="kicker" id="timerLabel">DEEP WORK</div>
+      <div class="timer-ring" id="timerRing"><div><div class="timer-time" id="timerDisplay">25:00</div><div class="small">TIME TO FOCUS</div></div></div>
+      <div class="timer-modes">
+        <button class="pill selected" data-minutes="25" data-label="DEEP WORK">Focus · 25m</button>
+        <button class="pill" data-minutes="5" data-label="SHORT BREAK">Short break · 5m</button>
+        <button class="pill" data-minutes="15" data-label="LONG BREAK">Long break · 15m</button>
+      </div>
+      <div style="display:flex;justify-content:center;gap:10px;margin-top:22px">
+        <button class="btn primary" id="timerToggle">▶ Start focus</button>
+        <button class="btn" id="timerReset">↺ Reset</button>
+      </div>
+      <p class="muted" style="margin-top:18px;font-size:13px">Completed focus sessions count toward your daily total. The timer runs while this page stays open.</p>
+    </div>
+    <div class="card" style="margin-top:16px"><h2>Make this session count</h2>
+      <p class="muted" style="margin:7px 0 15px">Write down what you want to finish before the timer ends.</p>
+      <textarea class="field" id="focusIntention" rows="3" maxlength="500" placeholder="For the next 25 minutes, I will..."></textarea>
+    </div>
+  </section>
+
+  <section class="view" id="view-goals">
+    <div class="page-intro"><div class="kicker">A DIRECTION TO GROW</div><h1>Your goals</h1>
+      <p>Big ambitions become achievable through small milestones.</p></div>
+    <form id="goalForm" class="card task-form"><div class="form-grid">
+      <label>What do you want to achieve?<input class="field" name="title" required maxlength="140" placeholder="e.g. Complete my course"></label>
+      <label>Target date<input class="field" name="due" type="date"></label>
+      <label>Starting progress (%)<input class="field" name="progress" type="number" min="0" max="100" value="0"></label>
+      <label>Why does this matter?<input class="field" name="reason" maxlength="240" placeholder="Your reason keeps you grounded"></label>
+      <div class="full"><button class="btn primary" type="submit">＋ Set a goal</button></div>
+    </div></form>
+    <div class="grid" id="goalList" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))"></div>
+  </section>
+
+  <section class="view" id="view-journal">
+    <div class="page-intro"><div class="kicker">A PLACE TO BE HONEST</div><h1>Your journal</h1>
+      <p>Reflect without judgment. Your entries stay in this browser unless you export them.</p></div>
+    <form id="journalForm" class="card task-form"><div class="form-grid">
+      <label class="full">Today's mood<select class="field" name="mood"><option>Reflective</option><option>Happy</option><option>Calm</option><option>Motivated</option><option>Stressed</option><option>Sad</option><option>Grateful</option><option>Unsure</option></select></label>
+      <label class="full">What's on your mind?<textarea class="field" name="body" rows="6" required maxlength="10000" placeholder="Start wherever you are. What happened today? How are you feeling?"></textarea></label>
+      <div class="full"><button class="btn primary" type="submit">Save reflection ↗</button></div>
+    </div></form>
+    <div class="section-head"><h2>Past reflections</h2><span class="small" id="journalCount"></span></div>
+    <div class="grid" id="journalList" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,290px),1fr))"></div>
+  </section>
+
+  <section class="view" id="view-guide">
+    <div class="page-intro"><div class="kicker">THINK IT THROUGH</div><h1>Your personal guide</h1>
+      <p>A practical reflection assistant to help you plan, prioritize, and work through everyday challenges.</p></div>
+    <div class="card">
+      <div style="display:flex;gap:13px;align-items:center;margin-bottom:20px">
+        <div class="logo" style="width:49px;height:49px;font-size:23px">✧</div>
+        <div><h2>ORBIT Guide</h2><div class="small">On-device rules · No external AI connected</div></div>
+      </div>
+      <div class="stack" id="guideMessages" aria-live="polite">
+        <div class="guide-message">Hi. What's on your mind today? Tell me what you're trying to accomplish, what feels difficult, or what you need help organizing.</div>
+      </div>
+      <form class="guide-form" id="guideForm">
+        <input class="field" name="message" required maxlength="1500" placeholder="What would you like help with?">
+        <button class="btn primary" type="submit">Ask ↗</button>
+      </form>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:13px">
+        <button class="pill prompt" data-prompt="Help me prioritize my day">Prioritize my day</button>
+        <button class="pill prompt" data-prompt="I keep procrastinating. Help me start small.">Beat procrastination</button>
+        <button class="pill prompt" data-prompt="Help me break a big goal into smaller steps">Break down a goal</button>
+        <button class="pill prompt" data-prompt="Give me a short reflection exercise">Reflect on my day</button>
+      </div>
+      <p class="small" style="margin-top:18px">This first version uses local rules and your saved tasks/goals. It is not a connected large language model and does not provide medical, mental-health, or professional advice.</p>
+    </div>
+  </section>
+
+  <section class="view" id="view-settings">
+    <div class="page-intro"><div class="kicker">MAKE IT YOURS</div><h1>Settings & data</h1>
+      <p>Your workspace, your preferences, your control.</p></div>
+    <div class="card" style="margin-bottom:16px"><h2>Your profile</h2><p class="muted" style="margin:6px 0 18px">Personalize your workspace.</p>
+      <form id="profileForm" class="form-grid">
+        <label>Name<input class="field" name="name" maxlength="70" required></label>
+        <label>What are you focusing on?<select class="field" name="focusArea"><option>Personal growth</option><option>Studies</option><option>Career</option><option>Health & fitness</option><option>Creativity</option><option>Better balance</option></select></label>
+        <div class="full"><button class="btn primary" type="submit">Save profile</button></div>
+      </form>
+    </div>
+    <div class="card" style="margin-bottom:16px"><h2>Your data</h2>
+      <p class="muted" style="margin:6px 0 18px">Export a backup or restore a previously exported ORBIT JSON file.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn primary" id="exportBtn">↓ Export backup</button>
+        <button class="btn" id="importBtn">↑ Import backup</button>
+        <input type="file" id="importFile" accept=".json,application/json" hidden>
+      </div>
+      <p class="small" style="margin-top:15px">Your data is stored in this browser. Clearing browser storage, using a different browser, or using another device will not automatically transfer it. Export backups regularly.</p>
+    </div>
+    <div class="card"><h2>Reset workspace</h2><p class="muted" style="margin:6px 0 15px">Permanently delete this browser's ORBIT data.</p>
+      <button class="btn" id="resetBtn" style="border-color:#6b3044;color:var(--danger)">Delete all my data</button></div>
+  </section>
+  <footer>ORBIT · Make space for what matters. · Your personal data stays in your browser.</footer>
+</main>
+</div>
+
+<dialog id="onboarding">
+  <div class="brand" style="padding:0 0 20px"><div class="logo">O</div> ORBIT</div>
+  <div class="kicker">WELCOME TO YOUR NEXT CHAPTER</div>
+  <h1 style="margin-top:10px">Make space for what matters.</h1>
+  <p class="muted" style="margin:10px 0 22px">A calmer way to plan your day, build better habits, and make progress on your own terms.</p>
+  <form id="onboardingForm">
+    <label>What should we call you?<input class="field" name="name" required maxlength="70" placeholder="Your first name" style="margin-top:3px"></label>
+    <label style="margin-top:15px">What's your main focus?
+      <select class="field" name="focusArea" style="margin-top:3px"><option>Personal growth</option><option>Studies</option><option>Career</option><option>Health & fitness</option><option>Creativity</option><option>Better balance</option></select>
+    </label>
+    <button class="btn primary" style="width:100%;margin-top:20px" type="submit">Create my space →</button>
+  </form>
+  <p class="small" style="margin-top:15px">No account required. Your workspace is saved locally on this device.</p>
+</dialog>
+
+<dialog id="editDialog"><h2 id="editTitle">Update progress</h2>
+  <form id="editForm"><input type="hidden" name="id"><input type="hidden" name="type">
+    <label id="editLabel">Value<input class="field" name="value" type="number" min="0" max="100" required></label>
+    <div class="dialog-actions"><button type="button" class="btn" id="editCancel">Cancel</button><button class="btn primary" type="submit">Save</button></div>
+  </form>
+</dialog>
+<div id="toast" class="toast" hidden role="status"></div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const STORE = "orbit_workspace_v1";
+const today = () => new Date().toLocaleDateString("en-CA");
+const uid = () => crypto.randomUUID ? crypto.randomUUID() :
+  Date.now().toString(36)+Math.random().toString(36).slice(2);
+const fresh = () => ({
+  version:1, profile:{name:"",focusArea:"Personal growth"},
+  tasks:[],habits:[],goals:[],journal:[],focus:{},
+  settings:{theme:"dark",intention:""}
+});
+let data = fresh();
+let timer = {duration:1500,remaining:1500,running:false,endsAt:0,label:"DEEP WORK",interval:null};
+
+function load(){
+  try{
+    const raw=localStorage.getItem(STORE);
+    if(raw){
+      const parsed=JSON.parse(raw);
+      if(parsed && parsed.version===1){
+        data={...fresh(),...parsed,profile:{...fresh().profile,...parsed.profile},
+          settings:{...fresh().settings,...parsed.settings},
+          focus:parsed.focus||{},tasks:Array.isArray(parsed.tasks)?parsed.tasks:[],
+          habits:Array.isArray(parsed.habits)?parsed.habits:[],
+          goals:Array.isArray(parsed.goals)?parsed.goals:[],
+          journal:Array.isArray(parsed.journal)?parsed.journal:[]};
+      }
+    }
+  }catch(e){console.error("Could not read ORBIT data",e)}
+}
+let savePending=false;
+function save(){
+  try{localStorage.setItem(STORE,JSON.stringify(data));savePending=false}
+  catch(e){toast("Could not save. Export a backup or free browser storage.");console.error(e)}
+}
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function toast(message){
+  const t=$("#toast");t.textContent=message;t.hidden=false;
+  clearTimeout(toast.timeout);toast.timeout=setTimeout(()=>t.hidden=true,2600);
+}
+function focusToday(){return data.focus[today()]||0}
+function doneTasks(){return data.tasks.filter(t=>t.done&&t.completedOn===today()).length}
+function habitDone(h){return h.completedOn===today()}
+function pct(a,b){return b?Math.round(a/b*100):0}
+function dayLabel(){return new Date().toLocaleDateString(undefined,{weekday:"long",month:"long",day:"numeric",year:"numeric"})}
+function greet(){
+ const h=new Date().getHours();
+ return h<12?"Good morning":h<17?"Good afternoon":"Good evening";
+}
+function setView(name){
+ if(!$("#view-"+name))return;
+ $$(".view").forEach(v=>v.classList.toggle("active",v.id==="view-"+name));
+ $$("#navigation button").forEach(b=>b.classList.toggle("active",b.dataset.view===name));
+ $("#sidebar").classList.remove("open");
+ window.scrollTo({top:0,behavior:"smooth"});
+ if(name==="tasks")renderTasks();
+ if(name==="habits")renderHabits();
+ if(name==="goals")renderGoals();
+ if(name==="journal")renderJournal();
+ if(name==="settings")fillProfile();
+}
+function bindNavigation(){
+ $$("#navigation [data-view]").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.view)));
+ $$("[data-go]").forEach(b=>b.addEventListener("click",()=>setView(b.dataset.go)));
+ $("#menuBtn").addEventListener("click",()=>$("#sidebar").classList.toggle("open"));
+ $("#quickAdd").addEventListener("click",()=>{setView("tasks");$("#taskForm").elements.title.focus()});
+ $("#themeBtn").addEventListener("click",()=>{
+  data.settings.theme=data.settings.theme==="light"?"dark":"light";applyTheme();save();
+ });
+}
+function applyTheme(){
+ document.body.classList.toggle("light",data.settings.theme==="light");
+}
+function applyProfile(){
+ const name=data.profile.name||"Your space";
+ $("#profileName").textContent=name;
+ $("#avatar").textContent=name==="Your space"?"O":name.trim().charAt(0).toUpperCase();
+ $("#greeting").textContent=(data.profile.name?greet()+", "+data.profile.name+".": "Make today count.");
+ $("#dateLine").textContent=dayLabel();
+}
+function renderDashboard(){
+ applyProfile();
+ const todayTasks=data.tasks.filter(t=>!t.due||t.due<=today()||t.completedOn===today());
+ $("#statTasks").textContent=doneTasks()+"/"+todayTasks.length;
+ const habitsDone=data.habits.filter(habitDone).length;
+ $("#statHabits").textContent=pct(habitsDone,data.habits.length)+"%";
+ $("#statFocus").textContent=focusToday();
+ $("#statGoals").textContent=data.goals.filter(g=>g.progress<100).length;
+ const tasks=[...data.tasks].filter(t=>!t.done).sort((a,b)=>
+  ({High:0,Medium:1,Low:2}[a.priority]??1)-({High:0,Medium:1,Low:2}[b.priority]??1)).slice(0,5);
+ $("#dashboardTasks").innerHTML=tasks.length?tasks.map(taskHTML).join(""):'<div class="empty">No open tasks. Add a small priority to get started.</div>';
+ const hs=data.habits.slice(0,5);
+ $("#dashboardHabits").innerHTML=hs.length?hs.map(h=>`
+ <div class="habit-row"><span class="habit-emoji">${esc(h.emoji)}</span><div class="item-main">
+ <div class="item-title">${esc(h.title)}</div><div class="progress" style="margin-top:7px"><span style="width:${habitDone(h)?100:0}%"></span></div></div>
+ <input class="check habit-check" type="checkbox" data-id="${esc(h.id)}" ${habitDone(h)?"checked":""} aria-label="Mark ${esc(h.title)} complete"></div>`).join(""):'<div class="empty">Add a habit you want to build.</div>';
+ const momentum=pct(doneTasks()+habitsDone,data.tasks.filter(t=>!t.due||t.due<=today()).length+data.habits.length);
+ $("#momentumLabel").textContent=momentum+"%";
+ $("#momentumBar").style.width=momentum+"%";
+ const goals=data.goals.filter(g=>g.progress<100).slice(0,2);
+ $("#dashboardGoals").innerHTML=goals.length?goals.map(g=>`
+ <div style="margin-bottom:15px"><div class="goal-meta"><strong>${esc(g.title)}</strong><span class="small">${g.progress}%</span></div>
+ <div class="progress" style="margin-top:9px"><span style="width:${g.progress}%"></span></div></div>`).join(""):'<div class="empty">Your next chapter starts with one goal.</div>';
+ $("#dashboardTasks").querySelectorAll("[data-task-toggle]").forEach(b=>b.addEventListener("change",()=>toggleTask(b.dataset.taskToggle,b.checked)));
+ $("#dashboardHabits").querySelectorAll(".habit-check").forEach(b=>b.addEventListener("change",()=>toggleHabit(b.dataset.id,b.checked)));
+}
+function taskHTML(t){
+ return `<div class="item ${t.done?"done":""}">
+ <input class="check" type="checkbox" data-task-toggle="${esc(t.id)}" ${t.done?"checked":""} aria-label="Complete ${esc(t.title)}">
+ <div class="item-main"><div class="item-title">${esc(t.title)}</div><div class="small">${t.due?"Due "+esc(t.due):"No due date"}</div></div>
+ <span class="tag">${esc(t.priority||"Medium")}</span>
+ <button class="link delete-task" data-id="${esc(t.id)}" aria-label="Delete task">×</button></div>`;
+}
+function renderTasks(){
+ const q=$("#taskSearch").value.toLowerCase().trim(),f=$("#taskFilter").value;
+ let list=data.tasks.filter(t=>(t.title.toLowerCase().includes(q))&&(f==="all"||(f==="open"&&!t.done)||(f==="done"&&t.done)));
+ list.sort((a,b)=>Number(a.done)-Number(b.done));
+ $("#taskCount").textContent=list.length+" tasks";
+ $("#taskList").innerHTML=list.length?list.map(taskHTML).join(""):'<div class="empty">No matching tasks. Create one above.</div>';
+ $("#taskList").querySelectorAll("[data-task-toggle]").forEach(b=>b.addEventListener("change",()=>toggleTask(b.dataset.taskToggle,b.checked)));
+ $("#taskList").querySelectorAll(".delete-task").forEach(b=>b.addEventListener("click",()=>deleteTask(b.dataset.id)));
+}
+function toggleTask(id,done){
+ const t=data.tasks.find(x=>x.id===id);if(!t)return;
+ t.done=done;t.completedOn=done?today():null;save();renderAll();
+}
+function deleteTask(id){
+ data.tasks=data.tasks.filter(t=>t.id!==id);save();renderAll();toast("Task deleted.");
+}
+$("#taskForm").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget),title=String(f.get("title")).trim();
+ if(!title)return;
+ data.tasks.push({id:uid(),title,priority:f.get("priority"),due:f.get("due"),done:false,completedOn:null,createdOn:today()});
+ e.currentTarget.reset();save();renderAll();toast("Task added.");
+});
+$("#taskSearch").addEventListener("input",renderTasks);
+$("#taskFilter").addEventListener("change",renderTasks);
+
+function renderHabits(){
+ $("#habitList").innerHTML=data.habits.length?data.habits.map(h=>`
+ <div class="card"><div class="habit-row"><span class="habit-emoji">${esc(h.emoji)}</span>
+ <div class="item-main"><h3>${esc(h.title)}</h3><div class="small">${habitDone(h)?"Completed today":"Your next small step"}</div></div>
+ <input class="check habit-check" type="checkbox" data-id="${esc(h.id)}" ${habitDone(h)?"checked":""} aria-label="Mark habit complete"></div>
+ <div class="progress" style="margin-top:18px"><span style="width:${habitDone(h)?100:0}%"></span></div>
+ <div style="display:flex;justify-content:flex-end;margin-top:13px"><button class="link delete-habit" data-id="${esc(h.id)}">Remove</button></div></div>`).join(""):'<div class="card empty">No habits yet. Start with one small thing you can repeat.</div>';
+ $("#habitList").querySelectorAll(".habit-check").forEach(b=>b.addEventListener("change",()=>toggleHabit(b.dataset.id,b.checked)));
+ $$(".delete-habit").forEach(b=>b.addEventListener("click",()=>{data.habits=data.habits.filter(h=>h.id!==b.dataset.id);save();renderAll()}));
+}
+function toggleHabit(id,done){
+ const h=data.habits.find(x=>x.id===id);if(!h)return;
+ h.completedOn=done?today():null;save();renderAll();
+}
+$("#habitForm").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget),title=String(f.get("title")).trim();if(!title)return;
+ data.habits.push({id:uid(),title,emoji:f.get("emoji"),completedOn:null,createdOn:today()});
+ e.currentTarget.reset();save();renderAll();toast("Habit created.");
+});
+
+function renderGoals(){
+ $("#goalList").innerHTML=data.goals.length?data.goals.map(g=>`
+ <div class="card goal-card"><div class="kicker">YOUR NORTH STAR</div>
+ <div><h2>${esc(g.title)}</h2><p class="muted" style="margin-top:6px;font-size:13px">${esc(g.reason||"Every step counts.")}</p></div>
+ <div class="goal-meta"><span class="goal-number">${g.progress}%</span><span class="small">${g.due?"Target "+esc(g.due):"No target date"}</span></div>
+ <div class="progress"><span style="width:${g.progress}%"></span></div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn edit-goal" data-id="${esc(g.id)}">${g.progress===100?"Update progress":"Update progress"}</button><button class="link delete-goal" data-id="${esc(g.id)}">Remove</button></div></div>`).join(""):'<div class="card empty">You don't need a perfect plan. Just a direction.</div>';
+ $$(".edit-goal").forEach(b=>b.addEventListener("click",()=>openEdit("goal",b.dataset.id)));
+ $$(".delete-goal").forEach(b=>b.addEventListener("click",()=>{data.goals=data.goals.filter(g=>g.id!==b.dataset.id);save();renderAll()}));
+}
+$("#goalForm").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget),title=String(f.get("title")).trim();if(!title)return;
+ data.goals.push({id:uid(),title,due:f.get("due"),progress:Math.max(0,Math.min(100,Number(f.get("progress"))||0)),reason:String(f.get("reason")).trim(),createdOn:today()});
+ e.currentTarget.reset();save();renderAll();toast("Goal created.");
+});
+function openEdit(type,id){
+ const g=data.goals.find(x=>x.id===id);if(!g)return;
+ $("#editTitle").textContent="Update goal progress";
+ $("#editLabel").firstChild.textContent="Progress percentage";
+ $("#editForm").elements.id.value=id;$("#editForm").elements.type.value=type;
+ $("#editForm").elements.value.value=g.progress;$("#editDialog").showModal();
+}
+$("#editCancel").addEventListener("click",()=>$("#editDialog").close());
+$("#editForm").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget),g=data.goals.find(x=>x.id===f.get("id"));
+ if(g){g.progress=Math.max(0,Math.min(100,Number(f.get("value"))));save();renderAll();toast("Progress updated.");}
+ $("#editDialog").close();
+});
+
+function renderJournal(){
+ const entries=[...data.journal].sort((a,b)=>b.createdAt.localeCompare(a.createdAt));
+ $("#journalCount").textContent=entries.length+" entries";
+ $("#journalList").innerHTML=entries.length?entries.map(j=>`
+ <article class="card"><div class="entry-date">${esc(j.date)} · ${esc(j.mood)}</div>
+ <div class="journal-entry">${esc(j.body)}</div>
+ <div style="display:flex;justify-content:flex-end"><button class="link delete-journal" data-id="${esc(j.id)}">Delete entry</button></div></article>`).join(""):'<div class="card empty">Your reflections will appear here.</div>';
+ $$(".delete-journal").forEach(b=>b.addEventListener("click",()=>{
+  if(!confirm("Delete this journal entry?"))return;
+  data.journal=data.journal.filter(j=>j.id!==b.dataset.id);save();renderJournal();
+ }));
+}
+$("#journalForm").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget),body=String(f.get("body")).trim();if(!body)return;
+ data.journal.push({id:uid(),mood:f.get("mood"),body,date:today(),createdAt:new Date().toISOString()});
+ e.currentTarget.reset();save();renderJournal();toast("Reflection saved.");
+});
+
+function renderTimer(){
+ const m=Math.floor(timer.remaining/60),s=timer.remaining%60;
+ $("#timerDisplay").textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+ $("#timerLabel").textContent=timer.label;
+ $("#timerToggle").textContent=timer.running?"Ⅱ Pause":"▶ Start "+(timer.label==="DEEP WORK"?"focus":"timer");
+ $("#timerRing").style.setProperty("--rotation",(1-timer.remaining/timer.duration)*360+"deg");
+ $$(".timer-modes button").forEach(b=>b.classList.toggle("selected",Number(b.dataset.minutes)*60===timer.duration&&b.dataset.label===timer.label));
+}
+function stopTimer(){
+ if(timer.interval)clearInterval(timer.interval);
+ timer.interval=null;timer.running=false;
+}
+function timerTick(){
+ if(!timer.running)return;
+ timer.remaining=Math.max(0,Math.ceil((timer.endsAt-Date.now())/1000));
+ if(timer.remaining===0){
+  stopTimer();
+  if(timer.label==="DEEP WORK"){data.focus[today()]=(data.focus[today()]||0)+Math.round(timer.duration/60);save();renderAll();toast("Focus session complete. Take a breath.");}
+  else toast("Break complete. Ready when you are.");
+  renderTimer();return;
+ }
+ renderTimer();
+}
+function startTimer(){
+ if(timer.running){stopTimer();renderTimer();return}
+ if(timer.remaining<=0)timer.remaining=timer.duration;
+ timer.running=true;timer.endsAt=Date.now()+timer.remaining*1000;
+ timer.interval=setInterval(timerTick,250);renderTimer();
+}
+$$(".timer-modes button").forEach(b=>b.addEventListener("click",()=>{
+ stopTimer();timer.duration=Number(b.dataset.minutes)*60;timer.remaining=timer.duration;timer.label=b.dataset.label;renderTimer();
+}));
+$("#timerToggle").addEventListener("click",startTimer);
+$("#timerReset").addEventListener("click",()=>{stopTimer();timer.remaining=timer.duration;renderTimer()});
+$("#focusIntention").addEventListener("input",e=>{data.settings.intention=e.target.value;save()});
+
+function guideReply(message){
+ const m=message.toLowerCase();
+ if(/prioriti|plan my day|organis|organize|overwhelm/.test(m)){
+  const open=data.tasks.filter(t=>!t.done).sort((a,b)=>({High:0,Medium:1,Low:2}[a.priority]??1)-({High:0,Medium:1,Low:2}[b.priority]??1));
+  return "Let's make your day manageable.\n\n"+(open.length?"Your highest-priority open tasks are:\n"+open.slice(0,3).map((t,i)=>(i+1)+". "+t.title+" ("+t.priority+")").join("\n")+"\n\nChoose one task that matters most. Give it a focused 15–25 minute block, then reassess.":"Your task list is empty. Add the one thing that would make today feel worthwhile.")+"\n\nKeep your plan realistic; leave room for breaks.";
+ }
+ if(/procrastinat|can't start|cannot start|putting off|avoid/.test(m))
+  return "Try the two-minute entry point.\n\n1. Define the smallest visible action.\n2. Make it so small it feels easy to begin.\n3. Set a five-minute timer.\n4. Put away one distraction.\n\nYou don't have to finish the whole task right now. You only have to begin. What is the first tiny action you could take?";
+ if(/goal|break down|achiev|ambition/.test(m)){
+  const g=data.goals.filter(x=>x.progress<100);
+  return "Turn the outcome into a sequence of actions:\n\n1. Define what 'done' looks like.\n2. Identify the next milestone.\n3. Convert that milestone into a task you can complete in one sitting.\n4. Pick a date to review your progress.\n\n"+(g.length?"Your current goal: "+g[0].title+" ("+g[0].progress+"% recorded).":"You haven't added a goal yet. Create one in the Goals section.")+"\n\nWhat's the smallest action you can take this week?";
+ }
+ if(/reflect|journal|today|feeling|grateful/.test(m))
+  return "Take a moment to reflect without judging yourself.\n\n• What went better than expected?\n• What felt difficult, and what might it be telling you?\n• What is one thing you appreciate today?\n• What would make tomorrow a little easier?\n\nYou don't need perfect answers. Write whatever feels honest in your journal.";
+ if(/habit|consistent|routine/.test(m))
+  return "Make a habit easier to repeat:\n\n1. Attach it to something you already do.\n2. Start with a version that takes two minutes.\n3. Make the tools you need easy to reach.\n4. Track completion without expecting perfection.\n5. If you miss a day, simply restart.\n\nChoose one habit in ORBIT and define its smallest useful version.";
+ if(/stress|anxious|sad|unhappy|lonely|burnout/.test(m))
+  return "It sounds like things may feel heavy right now. You don't have to solve everything at once.\n\nTry naming the one thing that needs your attention first. If you can, take a slow breath, drink some water, or reach out to someone you trust.\n\nI am a simple planning assistant, not a therapist or crisis service. If you feel unsafe or need urgent support, contact a trusted person or local emergency services.";
+ if(/focus|distract|concentrat/.test(m))
+  return "Let's make focus easier:\n\n1. Choose one specific outcome.\n2. Silence notifications and close unrelated tabs.\n3. Set a 25-minute timer, or start with five minutes.\n4. Keep a note for distracting thoughts to revisit later.\n5. Take a short break when the session ends.\n\nYou can start a session in the Focus room.";
+ return "Let's work through this step by step.\n\nFirst, describe the outcome you want. Next, identify what's blocking you. Then choose one action you can take in the next 10 minutes.\n\nA useful question to ask yourself is: 'What part of this can I influence right now?'\n\nI use simple built-in response rules rather than a live AI model in this version. Try asking me to prioritize your day, break down a goal, build a habit, or work through procrastination.";
+}
+function addGuideMessage(message,isUser){
+ const div=document.createElement("div");div.className=isUser?"item-title":"guide-message";
+ if(isUser){div.style.cssText="padding:12px 15px;background:var(--panel2);border-radius:12px;align-self:flex-end;margin:5px 0 10px;max-width:95%"}
+ div.textContent=message;$("#guideMessages").append(div);
+}
+function askGuide(message){
+ addGuideMessage(message,true);addGuideMessage(guideReply(message),false);
+ $("#guideMessages").scrollTop=$("#guideMessages").scrollHeight;
+}
+$("#guideForm").addEventListener("submit",e=>{
+ e.preventDefault();const input=e.currentTarget.elements.message;
+ const m=input.value.trim();if(!m)return;input.value="";askGuide(m);
+});
+$$(".prompt").forEach(b=>b.addEventListener("click",()=>askGuide(b.dataset.prompt)));
+
+function fillProfile(){
+ $("#profileForm").elements.name.value=data.profile.name||"";
+ $("#profileForm").elements.focusArea.value=data.profile.focusArea||"Personal growth";
+}
+$("#profileForm").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget);
+ data.profile.name=String(f.get("name")).trim();
+ data.profile.focusArea=f.get("focusArea");save();applyProfile();toast("Profile saved.");
+});
+function renderAll(){
+ renderDashboard();renderTasks();renderHabits();renderGoals();renderJournal();renderTimer();
+}
+$("#exportBtn").addEventListener("click",()=>{
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:"application/json"});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download="orbit-backup-"+today()+".json";a.click();URL.revokeObjectURL(url);
+ toast("Backup export started.");
+});
+$("#importBtn").addEventListener("click",()=>$("#importFile").click());
+$("#importFile").addEventListener("change",async e=>{
+ const file=e.target.files[0];if(!file)return;
+ try{
+  const incoming=JSON.parse(await file.text());
+  const arrays=["tasks","habits","goals","journal"];
+  if(incoming.version!==1||!incoming.profile||arrays.some(k=>!Array.isArray(incoming[k]))||!incoming.settings||typeof incoming.settings!=="object"||!incoming.focus||typeof incoming.focus!=="object")throw Error("Invalid ORBIT backup");
+  if(!confirm("Import this backup and replace the current workspace? Export your current data first if you need it."))return;
+  for(const k of arrays)if(incoming[k].some(x=>!x||typeof x!=="object"||typeof x.id!=="string"))throw Error("Invalid records");
+  data={...fresh(),...incoming,profile:{...fresh().profile,...incoming.profile},settings:{...fresh().settings,...incoming.settings}};
+  save();applyTheme();fillProfile();renderAll();toast("Backup restored.");
+ }catch(err){toast("Import failed. Choose a valid ORBIT backup.");console.error(err)}
+ finally{e.target.value=""}
+});
+$("#resetBtn").addEventListener("click",()=>{
+ if(!confirm("Delete ALL ORBIT data stored in this browser? This cannot be undone unless you have a backup."))return;
+ stopTimer();localStorage.removeItem(STORE);data=fresh();save();applyTheme();renderAll();fillProfile();$("#onboarding").showModal();toast("Workspace reset.");
+});
+$("#onboardingForm").addEventListener("submit",e=>{
+ e.preventDefault();const f=new FormData(e.currentTarget);
+ data.profile.name=String(f.get("name")).trim();data.profile.focusArea=f.get("focusArea");
+ save();applyProfile();e.currentTarget.closest("dialog").close();renderAll();toast("Welcome to ORBIT.");
+});
+function init(){
+ load();applyTheme();bindNavigation();fillProfile();renderAll();
+ $("#focusIntention").value=data.settings.intention||"";
+ if(!data.profile.name)$("#onboarding").showModal();
+}
+init();
+</script>
+</body>
+</html>
